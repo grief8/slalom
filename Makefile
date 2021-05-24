@@ -4,7 +4,7 @@ TF_LIB := $(shell python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib
 ######## SGX SDK Settings ########
 
 SGX_SDK ?= /opt/intel/sgxsdk
-SGX_MODE ?= HW
+SGX_MODE ?= SIM
 SGX_ARCH ?= x64
 SGX_DEBUG ?= 0
 SGX_PRERELEASE ?= 1
@@ -94,7 +94,7 @@ Enclave_Cpp_Files := Enclave/Enclave.cpp Enclave/sgxdnn.cpp
 SGXDNN_Cpp_Files := sgxdnn_main.cpp json11.cpp Crypto.cpp sgxaes.cpp aes-stream.cpp
 #SGXDNN_Cpp_Files += aesni_ghash.cpp aesni_key.cpp  aesni-wrap.cpp
 Enclave_Include_Paths := -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
-Enclave_Include_Paths += -IInclude -ISGXDNN -IInclude/eigen3_sgx -I/usr/lib/gcc/x86_64-linux-gnu/5.4.0/include 
+Enclave_Include_Paths += -IInclude -ISGXDNN -IInclude/eigen3_sgx -I/usr/lib/gcc/x86_64-linux-gnu/9/include
 
 CC_BELOW_4_9 := $(shell expr "`$(CC) -dumpversion`" \< "4.9")
 ifeq ($(CC_BELOW_4_9), 1)
