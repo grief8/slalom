@@ -1,5 +1,5 @@
 import tensorflow as tf
-from keras.layers import Conv2D, Dense, MaxPooling2D, Activation, ZeroPadding2D, Flatten, GlobalAveragePooling2D, \
+from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Activation, ZeroPadding2D, Flatten, GlobalAveragePooling2D, \
     Reshape, Dropout, AveragePooling2D, Lambda
 from keras.layers import initializers
 from keras.layers.normalization import BatchNormalization

@@ -34,7 +34,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-slim = tf.contrib.slim
+# slim = tf.contrib.slim
 
 _R_MEAN = 123.68
 _G_MEAN = 116.78
