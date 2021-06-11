@@ -4,10 +4,10 @@ from __future__ import print_function
 
 from python.preprocessing.vgg_preprocessing import _aspect_preserving_resize, \
     _central_crop, _RESIZE_SIDE_MIN
-from keras.applications.imagenet_utils import preprocess_input
-from keras.layers import *
+from tensorflow.keras.applications.imagenet_utils import preprocess_input
+from tensorflow.keras.layers import *
 from python.slalom.resnet import ResNetBlock
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from timeit import default_timer as timer
 import sys

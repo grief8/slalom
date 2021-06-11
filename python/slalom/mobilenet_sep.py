@@ -2,12 +2,12 @@ from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
 
-from keras.models import Model
-from keras.layers import *
-from keras.engine import get_source_inputs
-from keras.applications import imagenet_utils
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import *
+from tensorflow.python.keras.utils.layer_utils import get_source_inputs
+from tensorflow.keras.applications import imagenet_utils
 from keras.applications.imagenet_utils import _obtain_input_shape
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 
 def preprocess_input(x):

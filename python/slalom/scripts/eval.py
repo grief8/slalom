@@ -8,9 +8,9 @@ import os
 import json
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.python.client import timeline
-from keras import backend
+from tensorflow.keras import backend
 
 from python import imagenet
 from python.slalom.models import get_model
@@ -96,9 +96,9 @@ def main(_):
 
             #from multiprocessing.dummy import Pool as ThreadPool
             #pool = ThreadPool(3)
-    
             for i in range(num_batches):
                 images, true_labels = sess.run([dataset_images, labels])
+                print('begin training...')
 
                 if args.verify:
                     images = np.round(2**model_info['bits_x'] * images)
@@ -179,7 +179,6 @@ def main(_):
                     res.record_acc(preds, true_labels)
                     res.print_results()
 
-                    
                     #tl = timeline.Timeline(run_metadata.step_stats)
                     #ctf = tl.generate_chrome_trace_format()
                     #ctf_j = json.loads(ctf)
@@ -205,7 +204,7 @@ if __name__ == '__main__':
     parser.add_argument('mode', type=str, choices=['tf-gpu', 'tf-cpu', 'sgxdnn'])
 
     parser.add_argument('--input_dir', type=str,
-                        default='../imagenet/',
+                        default='/home/lifabing/projects/datasets/imagenet/output',
                         help='Input directory with images.')
     parser.add_argument('--batch_size', type=int, default=8,
                         help='How many images process at one time.')

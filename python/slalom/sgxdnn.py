@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Depthw
     Reshape, ZeroPadding2D, AveragePooling2D, Lambda
 from python.slalom.quant_layers import Conv2DQ, DenseQ, DepthwiseConv2DQ, ActivationQ
 from python.slalom.resnet import ResNetBlock
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 SGXDNNLIB = "App/enclave_bridge.so"

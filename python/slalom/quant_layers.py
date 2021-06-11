@@ -1,15 +1,23 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Activation, ZeroPadding2D, Flatten, GlobalAveragePooling2D, \
     Reshape, Dropout, AveragePooling2D, Lambda
-from keras.layers import initializers
-from keras.layers.normalization import BatchNormalization
-from keras.utils import conv_utils
-from keras.activations import relu, softmax, linear
-from keras.models import Sequential
-from keras.engine import InputLayer
-from keras.engine.topology import Layer
-from keras.applications.mobilenet import DepthwiseConv2D, relu6
-import keras.backend as K
+from tensorflow.keras import initializers
+from tensorflow.python.keras.layers.normalization import BatchNormalization
+from tensorflow.python.keras.utils import conv_utils
+from tensorflow.python.keras.layers import advanced_activations
+Relu = advanced_activations.ReLU
+Relu6 = advanced_activations.ReLU(6.)
+Softmax = advanced_activations.Softmax
+# from tensorflow.python.keras.activations import linear
+from tensorflow.keras.activations import relu, softmax, linear
+relu6 = tf.nn.relu6
+
+from tensorflow.keras.models import Sequential
+from tensorflow.python.keras.engine.input_layer import InputLayer
+from tensorflow.python.keras.engine.base_layer import Layer
+from tensorflow.python.keras.layers.convolutional import DepthwiseConv2D
+# import tensorflow.keras.activations.relu as relu6
+import tensorflow.keras.backend as K
 from python.slalom.resnet import ResNetBlock
 from python.slalom.utils import get_all_layers 
 import numpy as np
@@ -179,7 +187,7 @@ def fuse_bn(layers):
             conv = prev_layer[0]
 
             assert isinstance(conv, Conv2D) or isinstance(conv, DepthwiseConv2D)
-            assert layer.axis == 3 or layer.axis == -1
+            # assert layer.axis == 3 or layer.axis == -1
 
             mean = layer.moving_mean
             var = layer.moving_variance
@@ -215,7 +223,7 @@ def fuse_bn(layers):
             if isinstance(conv, DepthwiseConv2D):
                 new_w = np.transpose(new_w, (0, 1, 3, 2))
 
-            conv.set_weights((new_w, new_b)) 
+            conv.set_weights((new_w, new_b))
 
 
 # transform a model by quantizing and fusing layers
@@ -225,7 +233,7 @@ def transform(model, bits_w, bits_x, log=False, quantize=True, verif_preproc=Fal
     if slalom:
         assert(quantize)
 
-    old_ops = K.get_session().graph.get_operations()
+    old_ops = tf.Session().graph.get_operations()
 
     #all_layers = [[l] if not isinstance(l, ResNetBlock) else l.get_layers() for l in model.layers]
     #all_layers = list(itertools.chain.from_iterable(all_layers))
@@ -236,6 +244,8 @@ def transform(model, bits_w, bits_x, log=False, quantize=True, verif_preproc=Fal
     layers = model.layers
     layer_map = {}
     flattened = False
+
+    # raise AttributeError("Don't know how to handle layer {}".format(relu))
 
     def transform_layer(layer, next_layer, queue_ctr, flattened):
         print("transform {} (next = {})".format(layer, next_layer))
@@ -364,12 +374,38 @@ def transform(model, bits_w, bits_x, log=False, quantize=True, verif_preproc=Fal
             new_layers.append(Lambda(lambda x: K.round(x)))
 
         elif isinstance(layer, Activation):
-            assert layer.activation in [relu6, relu, softmax]
-
+            # assert layer.activation in [relu6, relu, softmax]
+            # raise AttributeError('acitvation {}'.format(layer.activation))
             queue = None if queues is None else queues[queue_ctr]
             queue_ctr += 1
 
             act_func = "relu6" if layer.activation == relu6 else "relu" if layer.activation == relu else "softmax"
+            if slalom and isinstance(next_layer, GlobalAveragePooling2D):
+                # assert layer.activation == relu6
+                act_func = "avgpoolrelu6"
+                skip_next = True
+
+            maxpool_params = None
+            if slalom and (isinstance(next_layer, MaxPooling2D) or isinstance(next_layer, AveragePooling2D)):
+                mp = next_layer
+                assert (layer.activation == relu)
+                maxpool_params = mp.get_config()
+                skip_next = True
+
+            new_layers.append(ActivationQ(act_func, bits_w, bits_x, log=log,
+                                          maxpool_params=maxpool_params,
+                                          quantize=quantize, slalom=slalom,
+                                          slalom_integrity=slalom_integrity,
+                                          slalom_privacy=slalom_privacy,
+                                          sgxutils=sgxutils, queue=queue))
+
+        elif isinstance(layer, type(Relu6)) or isinstance(layer, Relu) or isinstance(layer, Softmax):
+            # assert layer.activation in [relu6, relu, softmax]
+
+            queue = None if queues is None else queues[queue_ctr]
+            queue_ctr += 1
+
+            act_func = "relu6" if isinstance(layer, type(Relu6)) else "relu" if layer == Relu else "softmax"
             if slalom and isinstance(next_layer, GlobalAveragePooling2D):
                 #assert layer.activation == relu6
                 act_func = "avgpoolrelu6"
@@ -392,7 +428,7 @@ def transform(model, bits_w, bits_x, log=False, quantize=True, verif_preproc=Fal
         elif isinstance(layer, ZeroPadding2D):
             if quantize:
                 # merge with next layer
-                conv = next_layer 
+                conv = next_layer
                 assert isinstance(conv, Conv2D) or isinstance(conv, DepthwiseConv2D)
                 assert conv.padding == 'valid'
                 conv.padding = 'same'
@@ -433,7 +469,7 @@ def transform(model, bits_w, bits_x, log=False, quantize=True, verif_preproc=Fal
 
             [actq], queue_ctr, flattened, skip_next = transform_layer(layer.merge_act, next_layer, queue_ctr, flattened)
             new_layer = ResNetBlock(layer.kernel_size, layer.filters, layer.stage, layer.block, layer.identity,
-                                    layer.strides, path1=path1, path2=path2, merge_act=actq, 
+                                    layer.strides, path1=path1, path2=path2, merge_act=actq,
                                     quantize=quantize, bits_w=bits_w, bits_x=bits_x,
                                     slalom=slalom, slalom_integrity=slalom_integrity, slalom_privacy=slalom_privacy)
 
