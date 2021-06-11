@@ -26,9 +26,11 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 
-slim = tf.contrib.slim
+# slim = tf.contrib.slim
 
 _FILE_PATTERN = '%s-*'
 
@@ -63,7 +65,7 @@ def load_validation(input_dir, batch_size, preprocess,
     [dataset_image, label] = provider.get(['image', 'label'])
 
     dataset_image = preprocess(dataset_image)
-
+    print(dataset_image.shape)
     dataset_images, labels = tf.train.batch(
         [dataset_image, label],
         batch_size=batch_size,

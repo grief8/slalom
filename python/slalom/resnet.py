@@ -13,16 +13,16 @@ from __future__ import print_function
 
 import os
 
-from keras.layers import *
-from keras import layers
-from keras.models import Model, Sequential
-from keras import backend as K
-from keras.engine import get_source_inputs
-from keras.utils import layer_utils
+from tensorflow.keras.layers import *
+from tensorflow.keras import layers
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras import backend as K
+from tensorflow.python.keras.utils.layer_utils import get_source_inputs
+from tensorflow.python.keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import _obtain_input_shape
 from keras.engine.topology import load_weights_from_hdf5_group_by_name, h5py
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
 WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'

@@ -193,13 +193,13 @@ App/enclave_bridge.so: App/enclave_bridge.cpp App/Enclave_u.o
 	$(CXX) $(App_Cpp_Flags) App/enclave_bridge.cpp -o $@ App/Enclave_u.o $(App_Link_Flags)
 	@echo "CXX  <=  $<"
 
-#App/relu_slalom.so: App/relu_slalom.cc
-#	$(CXX) $(App_Cpp_Flags) App/relu_slalom.cc -o $@ App/Enclave_u.o App/enclave_bridge.so $(App_Link_Flags)
-#	@echo "CXX  <=  $<"
+App/relu_slalom.so: App/relu_slalom.cc
+	$(CXX) $(App_Cpp_Flags) App/relu_slalom.cc -o $@ App/Enclave_u.o App/enclave_bridge.so $(App_Link_Flags)
+	@echo "CXX  <=  $<"
 
-#App/%.so: App/%.cc App/Enclave_u.o
-#	$(CXX) $(App_Cpp_Flags) $< -o $@ App/Enclave_u.o $(App_Link_Flags)
-#	@echo "CXX  <=  $<"
+App/%.so: App/%.cc App/Enclave_u.o
+	$(CXX) $(App_Cpp_Flags) $< -o $@ App/Enclave_u.o $(App_Link_Flags)
+	@echo "CXX  <=  $<"
 
 $(App_Name): App/Enclave_u.o App/enclave_bridge.so #$(App_Cpp_Objects) $(App_CC_Objects)
 	$(CXX) $^ -o $@ $(App_Link_Flags)

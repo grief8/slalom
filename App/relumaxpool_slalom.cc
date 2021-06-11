@@ -1,5 +1,7 @@
 #define EIGEN_USE_THREADS
 
+#include "tensorflow/core/framework/kernel_shape_util.h"
+
 #include "tensorflow/core/framework/numeric_op.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/tensor_shape.h"

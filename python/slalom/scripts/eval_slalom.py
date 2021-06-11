@@ -3,13 +3,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import python.slalom.keras_fix
+# import python.slalom.keras_fix
 
 import sys
 import os
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.python.client import timeline
 from keras import backend
 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
                         choices=['vgg_16', 'vgg_19', 'inception_v3', 'mobilenet', 'mobilenet_sep', 
                                  'resnet_18', 'resnet_34', 'resnet_50', 'resnet_101', 'resnet_152'])
     parser.add_argument('--input_dir', type=str,
-                        default='../imagenet/',
+                        default='/home/lifabing/projects/datasets/imagenet/output',
                         help='Input directory with images.')
     parser.add_argument('--batch_size', type=int, default=8,
                         help='How many images process at one time.')

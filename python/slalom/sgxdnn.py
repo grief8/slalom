@@ -4,13 +4,13 @@ import json
 
 import numpy as np
 
-import keras
-from keras import activations
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, DepthwiseConv2D, GlobalAveragePooling2D, Dropout, \
+import tensorflow.keras as keras
+from tensorflow.keras import activations
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, DepthwiseConv2D, GlobalAveragePooling2D, Dropout, \
     Reshape, ZeroPadding2D, AveragePooling2D, Lambda
 from python.slalom.quant_layers import Conv2DQ, DenseQ, DepthwiseConv2DQ, ActivationQ
 from python.slalom.resnet import ResNetBlock
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 SGXDNNLIB = "App/enclave_bridge.so"
